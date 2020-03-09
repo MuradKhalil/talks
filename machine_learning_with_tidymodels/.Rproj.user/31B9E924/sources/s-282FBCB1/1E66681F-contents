@@ -1,0 +1,25 @@
+library(magick)
+
+image_read_svg("images/bonn_logo.svg")
+rsvg::rsvg_pdf("images/ey_logo.svg", file = "images/ey_logo.pdf")
+  image_write("images/bonn_logo.pdf", format = "pdf", density = 10)
+
+tmp <- image_read_svg("images/muradkhalilov.svg") %>%
+  image_background('white') %>%
+  image_scale("x500") %>%
+  image_fill("none", point = "+100", fuzz = 40) %>%
+  image_fill("none", point = "+1500", fuzz = 20) %>%
+  image_transparent(color = "none") %>%
+  image_flop()
+  image_fill("none", point = "+100+200", fuzz = 90)
+
+image_read("images/muradkhalilov_no_background.png")
+  
+
+channels <- image_separate(murad)
+image_append(channels)
+
+tmp <- image_fill(murad, "none", point = "+100", fuzz = 39)
+tmp2 <- image_fill(tmp, "none", point = "+500", fuzz = 20)
+tmp3 <- image_transparent(tmp2, 'white')
+image_write(tmp2, "images/tmp.svg")

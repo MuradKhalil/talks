@@ -1,0 +1,8 @@
+"0","validation_splits <- vfold_cv(juiced_train, v = 5, strata = survived)"
+"0","validation_splits"
+"1","# "
+"1"," "
+"1","5-fold cross-validation using stratification"
+"1"," "
+"1","
+"

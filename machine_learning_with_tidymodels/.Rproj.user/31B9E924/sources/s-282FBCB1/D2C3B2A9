@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1582646618469.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D2C3B2A9",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1582646618469,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "6FA62559",
+        "caption" : "juiced_train",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=juiced_train&cache_key=6FA62559",
+        "displayedObservations" : "669",
+        "environment" : "",
+        "expression" : "juiced_train",
+        "object" : "juiced_train",
+        "preview" : "0",
+        "totalObservations" : "669",
+        "variables" : "9"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

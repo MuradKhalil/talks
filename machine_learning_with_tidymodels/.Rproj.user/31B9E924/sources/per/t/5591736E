@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1582629180301.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "5591736E",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1582629180301,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "FC7B6FC",
+        "caption" : "nasa_fire",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=nasa_fire&cache_key=FC7B6FC",
+        "displayedObservations" : 34270,
+        "environment" : "",
+        "expression" : "nasa_fire",
+        "object" : "nasa_fire",
+        "preview" : 0,
+        "totalObservations" : 34270,
+        "variables" : 13
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

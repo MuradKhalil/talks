@@ -1,0 +1,56 @@
+---
+title: "Machine Learning with tidymodels"
+author: "Murad Khalilov"
+date: "5/03/2020"
+output: beamer_presentation
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, collapse = TRUE, dev = 'pdf')
+```
+## About me
+
+```{r fig.show = "hold", out.width = "40%", fig.align = 'center'}
+knitr::include_graphics(c("../images/bonn_logo.pdf", "../images/ey_logo.pdf"))
+```
+
+## Titanic
+
+```{r libraries, echo = TRUE, include=FALSE}
+library(conflicted)
+library(here)
+library(janitor)
+library(tidyverse)
+library(tidymodels)
+library(workflows)
+library(vroom)
+library(skimr)
+```
+
+```{r titanic, echo = TRUE, message = FALSE}
+titanic <- vroom("../input/train.csv", .name_repair = make_clean_names) %>%
+  mutate(survived = as_factor(survived))
+
+titanic
+```
+
+
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+

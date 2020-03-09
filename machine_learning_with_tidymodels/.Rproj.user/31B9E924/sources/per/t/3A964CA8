@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1582635981341.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3A964CA8",
+    "lastKnownWriteTime" : 4421792122,
+    "last_content_update" : 1582635981341,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "D0E8D7DA",
+        "caption" : "ufo_sightings",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=ufo_sightings&cache_key=D0E8D7DA",
+        "displayedObservations" : 80332,
+        "environment" : "",
+        "expression" : "ufo_sightings",
+        "object" : "ufo_sightings",
+        "preview" : 0,
+        "totalObservations" : 80332,
+        "variables" : 11
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

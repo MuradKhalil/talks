@@ -1,0 +1,9 @@
+"1","
+"
+"0","rf_fit %>%"
+"0","  predict(new_data = baked_test, type = ""prob"") %>%"
+"0","  mutate(true_label = baked_test$survived) %>%"
+"0","  collect_metrics()"
+"2","Unknown or uninitialised column: '.metrics'."
+"2","Error: All of the models failed.
+"

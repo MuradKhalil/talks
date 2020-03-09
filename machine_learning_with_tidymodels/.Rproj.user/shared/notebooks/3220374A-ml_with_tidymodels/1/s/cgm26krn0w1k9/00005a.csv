@@ -1,0 +1,8 @@
+"0",""
+"0","cv_results %>%"
+"0","  map(~ unnest(.x, .predictions)) %>%"
+"0","  map2(names(.), ~ mutate(.x, model = .y)) %>%"
+"0","  bind_rows() %>%"
+"0","  group_by(model) %>%"
+"0","  roc_curve(survived, .pred_1) %>%"
+"0","  autoplot()"

@@ -1,0 +1,76 @@
+#### LIBRARIES #################################################################
+
+library(conflicted)
+library(here)
+library(janitor)
+library(tidyverse)
+library(tidymodels)
+library(workflows)
+library(vroom)
+library(skimr)
+
+#### TRAIN TEST SPLIT ##########################################################
+
+titanic <- vroom("input/train.csv", .name_repair = make_clean_names) %>%
+  mutate(survived = as_factor(survived))
+skim(titanic)
+
+# train test split
+train_test_splits <- initial_split(titanic, prop = 0.75, strata = survived)
+training_data <- training(train_test_splits)
+testing_data <- testing(train_test_splits)
+
+
+#### FEATURE ENGINEERING AND SELECTION #########################################
+
+mr <- c("Don", "Major", "Capt", "Jonkheer", "Rev", "Col", "Sir")
+mrs <- c("Countess", "Mme", "Lady")
+miss <- c("Mlle", "Ms")
+
+blueprint <- recipe(survived ~ ., data = training_data) %>%
+  step_mutate(
+    title = str_extract(name, "\\w+?(?=\\.)"),
+    title = as_factor(case_when(
+      title %in% mr ~ "Mr",
+      title %in% mrs ~ "Mrs",
+      title %in% miss ~ "Miss",
+      title == "Dr" & sex == "male" ~ "Mr",
+      title == "Dr" & sex == "female" ~ "Mrs",
+      TRUE ~ title)),
+    # extract all letters from the cabin and select the first one
+    cabin = substr(str_remove_all(cabin, "[^a-zA-Z]"), 1, 1),
+    ) %>%
+  # label encoding
+  step_integer(cabin) %>%
+  # impute missing cabin letters
+  step_knnimpute(cabin, impute_with = "pclass") %>%
+  # impute age using titles (groupwise imputation)
+  step_bagimpute(age, impute_with = "title") %>%
+  # drop columns
+  step_rm("ticket", "name", "passenger_id") %>%
+  step_center(all_numeric(), -all_outcomes()) %>%
+  step_scale(all_numeric(), -all_outcomes()) %>%
+  step_dummy(embarked, sex, title, one_hot = F)
+
+# fit the recipe to the training data
+prepped <- prep(blueprint, training = training_data, strings_as_factors = T)
+
+# transform the training data
+juiced_train <- juice(prepped)
+
+# transorm the testing data
+baked_test <- bake(prepped, new_data = testing_data)
+
+glm_spec <- logistic_reg() %>%
+  set_engine("glm") %>%
+  set_mode("classification")
+
+glm_fit <- glm_spec %>%
+  fit(survived ~ ., data = juiced_train)
+
+glm_fit
+
+
+cv_split <- vfold_cv(training_data, v = 3) %>%
+  mutate(train = map(splits, ~training(.x)),
+         validate = map(splits, ~testing(.x)))

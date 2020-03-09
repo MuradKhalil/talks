@@ -1,0 +1,5 @@
+"0","knitr::include_graphics(c("
+"0","  here(""images/rsample.png""),"
+"0","  here(""images/recipes.png""),"
+"0","  here(""images/parsnip.png""),"
+"0","  here(""images/tune.png"")))"
