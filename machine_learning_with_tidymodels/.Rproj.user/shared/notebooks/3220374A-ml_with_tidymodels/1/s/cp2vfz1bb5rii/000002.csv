@@ -1,7 +1,0 @@
-"0","library(here)"
-"0","library(conflicted)"
-"0","library(janitor)"
-"0","library(vroom)"
-"0","library(patchwork)"
-"0",""
-"0","knitr::include_graphics(here(""images/tidymodels.png""))"

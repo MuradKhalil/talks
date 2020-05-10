@@ -1,4 +1,0 @@
-"0",""
-"0","# transform the testing data"
-"0","baked_test <- bake(prepped, new_data = testing_data)"
-"0","baked_test"

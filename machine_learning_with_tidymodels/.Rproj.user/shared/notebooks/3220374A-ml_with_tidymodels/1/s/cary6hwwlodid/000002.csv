@@ -1,4 +1,0 @@
-"0","library(reticulate)"
-"0","use_condaenv(condaenv = ""ing"", "
-"0","             conda = ""/Users/muradkhalilov/Anaconda/anaconda3/bin/python"","
-"0","             required = T)"

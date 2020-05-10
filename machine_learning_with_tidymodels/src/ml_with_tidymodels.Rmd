@@ -1,142 +1,51 @@
 ---
 title: "Machine Learning with tidymodels"
 author: "Murad Khalilov"
-date: "05/03/2020"
-output: html_document
+date: "11/05/2020"
+output: beamer_presentation
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, tidy = FALSE)
 ```
-<style>
-div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
-</style>
 
-```{r tidymodels, echo=FALSE, message=FALSE, fig.show='hold', fig.align='center', out.width="30%"}
+## Tidymodels suite
+```{r echo=FALSE, message=FALSE, fig.show='hold', fig.align='center', out.width="30%"}
 library(here)
 library(conflicted)
-library(janitor)
-library(vroom)
 library(patchwork)
 
 knitr::include_graphics(here("images/tidymodels.png"))
 ```
 
-<div style="margin-bottom:155px;">
-```{r tidymodels2, echo=FALSE, message=FALSE, fig.show="hold", out.width="25%"}
+```{r echo=FALSE, message=FALSE, fig.show="hold", fig.align='center', out.width="20%"}
 knitr::include_graphics(c(
   here("images/rsample.png"),
   here("images/recipes.png"),
   here("images/parsnip.png"),
   here("images/tune.png")))
 ```
-</div>
-
-```{r python_setup, include=FALSE}
-library(reticulate)
-use_condaenv(condaenv = "ing", 
-             conda = "/Users/muradkhalilov/Anaconda/anaconda3/bin/python",
-             required = T)
-```
-
-## scikit-learn
-```{python train_test_, include=FALSE}
-
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.ensemble import RandomForestRegressor
-
-data = pd.read_csv("../input/melb_data.csv")
-data.head()
-
-# Separate target from predictors
-y = data.Price
-X = data.drop(['Price'], axis=1)
-
-# Divide data into training and validation subsets
-X_train_full, X_valid_full, y_train, y_valid = train_test_split(
-  X, y, train_size=0.8, test_size=0.2, random_state=0)
-
-# "Cardinality" means the number of unique values in a column
-# Select categorical columns with relatively low cardinality (convenient but arbitrary)
-categorical_cols = [cname for cname in X_train_full.columns if 
-  X_train_full[cname].nunique() < 10 and X_train_full[cname].dtype == "object"]
-
-# Select numerical columns
-numerical_cols = [cname for cname in X_train_full.columns if 
-  X_train_full[cname].dtype in ['int64', 'float64']]
-
-# Keep selected columns only
-my_cols = categorical_cols + numerical_cols
-X_train = X_train_full[my_cols].copy()
-X_valid = X_valid_full[my_cols].copy()
-```
-
-<div class="blue">
-```{python pipeline, results = 'hide'}
-# Preprocessing for numerical data
-numerical_transformer = SimpleImputer(strategy='constant')
-
-# Preprocessing for categorical data
-categorical_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='most_frequent')),
-    ('onehot', OneHotEncoder(handle_unknown='ignore'))
-])
-
-# Bundle preprocessing for numerical and categorical data
-preprocessor = ColumnTransformer(
-    transformers=[
-        ('num', numerical_transformer, numerical_cols),
-        ('cat', categorical_transformer, categorical_cols)
-    ])
-    
-model = RandomForestRegressor(n_estimators=10, random_state=0)
-
-# Bundle preprocessing and modeling code in a pipeline
-my_pipeline = Pipeline(steps=[('preprocessor', preprocessor),
-                              ('model', model)
-                             ])
-
-# Preprocessing of training data, fit model 
-my_pipeline.fit(X_train, y_train)
-preds = my_pipeline.predict(X_valid)
-```
-</div>
-
-### Advantages
-1) Consistent API
-2) Reduced data leakage
-
-<div style="margin-bottom:200px;">
-</div>
 
 ## Titanic
-<div style="margin-bottom:200px;">
-<div class = "blue">
-```{r, titanic_photo, echo=FALSE, message=FALSE, fig.align='center', out.width="80%"}
+```{r echo=FALSE, message=FALSE, fig.align='center', out.width="80%"}
 knitr::include_graphics(here("images/titanic.jpg"))
 ```
-</div>
 
-```{r titanic_data, message=FALSE}
+## Titanic data
+\tiny
+```{r message=FALSE}
 library(tidyverse)
 library(tidymodels)
+library(janitor)
 
-titanic <- vroom(here("input/train.csv"), .name_repair = make_clean_names) %>%
+titanic <- read_csv(here("input/train.csv")) %>%
+  clean_names() %>%
   mutate(survived = as_factor(survived))
 
 glimpse(titanic)
 ```
-</div>
 
-<div style="margin-bottom:200px;">
-## EDA
-```{r EDA, message=FALSE, echo=FALSE, warning=FALSE, fig.align='center'}
-
+```{r message=FALSE, echo=FALSE, warning=FALSE}
 mr <- c("Don", "Major", "Capt", "Jonkheer", "Rev", "Col", "Sir")
 mrs <- c("Countess", "Mme", "Lady")
 miss <- c("Mlle", "Ms")
@@ -221,18 +130,20 @@ p8 <- plot_histogram(mydf, x = fare, fill = survived,
                      subtitle = "Fare distribution")
 p9 <- plot_cdf(mydf, x = fare, colour = survived, 
                subtitle = "CDF of the fare variable")
+```
 
+## EDA
+```{r message=FALSE, echo=FALSE, warning=FALSE, fig.align='center', out.width='90%'}
 p1 + p2 + p4 + p5
+```
+
+## EDA
+```{r message=FALSE, echo=FALSE, warning=FALSE, fig.align='center', out.width='90%'}
 p6 + p7 + p8 + p9
 ```
-</div>
 
-<div style="margin-bottom:200px;">
-## Train Test Split
-```{r rsample_sticker, out.width="25%", echo=FALSE}
-knitr::include_graphics(here("images/rsample.png"))
-```
-
+## Train test split
+\tiny
 ```{r train_test_split, message=FALSE}
 train_test_splits <- initial_split(titanic, prop = 0.75, strata = survived)
 train_test_splits
@@ -243,40 +154,40 @@ nrow(training_data)
 testing_data <- testing(train_test_splits)
 nrow(testing_data)
 ```
-</div>
 
-<div style="margin-bottom:200px;">
-## Feature Preprocessing and Engineering
-```{r recipes_sticker, out.width="25%", echo=FALSE}
-knitr::include_graphics(here("images/recipes.png"))
-```
-
-<div style="margin-bottom:100px;">
-<div class = "blue">
-```{r hadley_cupcakes, out.width="100%", echo=FALSE}
+## Data preprocessing or baking cupcakes
+```{r echo=FALSE}
 knitr::include_graphics(here("images/hadley_cupcakes.jpg"))
 ```
 
->1) <b> Get the ingredients (recipe()) </b>: specify the response variable and 
+## Recipes workflow
+\tiny
+
+Rebecca Barter:
+
+1) **Get the ingredients (recipe())**: specify the response variable and 
 predictor variables
->
->2) <b> Write the recipe (step_zzz()) </b>: define the pre-processing steps, 
+
+2) **Write the recipe (step_zzz())**: define the pre-processing steps, 
 such as imputation, creating dummy variables, scaling, and more
->
->3) <b> Prepare the recipe (prep()) </b>: provide a dataset to base each step on 
+
+3) **Prepare the recipe (prep())**: provide a dataset to base each step on 
 (e.g. if one of the steps is to remove variables that only have one unique 
 value, then you need to give it a dataset so it can decide which variables 
 satisfy this criteria to ensure that it is doing the same thing to every 
 dataset you apply it to)
->
->4) <b> Bake the recipe (bake()) </b>: apply the pre-processing steps to your 
-datasets. - Rebecca Barter
 
-</div>
-</div>
+4) **Bake the recipe (bake())**: apply the pre-processing steps to your 
+datasets
 
-```{r feature_engineering, message=FALSE}
-mr <- c("Don", "Major", "Capt", "Jonkheer", "Rev", "Col", "Sir")
+^[http://www.rebeccabarter.com/blog/2019-06-06_pre_processing/]
+
+## Define the recipe/blueprint
+\tiny
+```{r message=FALSE}
+
+mr <- c("Don", "Major", "Capt", "Jonkheer", 
+        "Rev", "Col", "Sir")
 mrs <- c("Countess", "Mme", "Lady")
 miss <- c("Mlle", "Ms")
 
@@ -296,33 +207,41 @@ blueprint <- recipe(survived ~ ., data = training_data) %>%
   # impute age using titles (groupwise imputation)
   step_bagimpute(age, impute_with = "title") %>%
   # drop columns
-  step_rm("passenger_id", "name", "sib_sp", "parch", "ticket", "cabin",
-          "embarked", "title") %>%
+  step_rm("passenger_id", "name", "sib_sp", "parch", "ticket", 
+          "cabin", "embarked", "title") %>%
   step_center(all_numeric(), -all_outcomes()) %>%
   step_scale(all_numeric(), -all_outcomes()) %>%
   step_dummy(all_nominal(), -all_outcomes(), one_hot = F) %>%
   step_nzv(all_predictors())
+```
 
+## Prepare the recipe
+\tiny
+```{r}
 # fit the recipe to the training data
 prepped <- prep(blueprint, training = training_data, strings_as_factors = T)
+prepped
+```
 
+## Applying preprocessing steps - juice and bake
+\tiny
+```{r}
 # transform the training data
 juiced_train <- juice(prepped)
 juiced_train
+```
 
+## Applying preprocessing steps - juice and bake
+\tiny
+```{r}
 # transform the testing data
 baked_test <- bake(prepped, new_data = testing_data)
 baked_test
 ```
-</div>
 
-<div style="margin-bottom:200px;">
-## Modelling
-```{r parsnip_sticker, out.width="25%", echo=FALSE}
-knitr::include_graphics(here("images/parsnip.png"))
-```
-
-```{r model_building, message=FALSE}
+## Modeling - logistic regression
+\tiny
+```{r message=FALSE}
 glm_spec <- logistic_reg() %>%
   set_engine("glm") %>%
   set_mode("classification")
@@ -331,6 +250,11 @@ glm_fit <- glm_spec %>%
   fit(survived ~ ., data = juiced_train)
 
 glm_fit
+```
+
+## Modeling - random forest
+\tiny
+```{r, message=FALSE}
 
 rf_spec <- rand_forest() %>%
   set_engine("ranger") %>%
@@ -341,38 +265,45 @@ rf_fit <- rf_spec %>%
 
 rf_fit
 ```
-</div>
 
 ## Cross-validation
-```{r tune_sticker, out.width="25%", echo=FALSE}
-knitr::include_graphics(here("images/tune.png"))
-```
-
-<div style="margin-bottom:200px;">
-```{r cross_validation}
+\tiny
+```{r}
 validation_splits <- vfold_cv(juiced_train, v = 5, strata = survived)
 validation_splits
+```
 
+## Cross-validation
+\tiny
+```{r}
 cv_results <- list(
   glm = fit_resamples(
-    survived ~ ., 
     glm_spec,
+    survived ~ ., 
     validation_splits,
     control = control_resamples(save_pred = T)
     ),
   rf = fit_resamples(
-    survived ~ ., 
     rf_spec,
+    survived ~ ., 
     validation_splits,
     control = control_resamples(save_pred = T)
     )
 )
 
 cv_results$glm
+```
 
+## Cross-validation
+\tiny
+```{r}
 cv_results$glm %>%
   unnest(.predictions)
+```
 
+## Cross-validation results
+\tiny
+```{r}
 roc <- cv_results %>%
   map(~ unnest(.x, .predictions)) %>%
   map2(names(.), ~ mutate(.x, model = .y)) %>%
@@ -381,37 +312,81 @@ roc <- cv_results %>%
   roc_curve(survived, .pred_1) 
 
 roc
+```
 
+## Cross-validation results
+\tiny
+```{r echo=FALSE, fig.align='center', out.width='80%'}
 roc %>%
   autoplot()
+```
 
+## Cross-validation results
+\tiny
+```{r}
 cv_results %>%
   map(~ collect_metrics(.x))
+```
 
+```{r}
 rf_fit %>%
   predict(new_data = baked_test, type = "prob") %>%
   mutate(true_label = baked_test$survived) %>%
   roc_auc(true_label, .pred_1)
 ```
-</div>
 
-<div style="margin-bottom:200px;">
-## Bonus: workflows
-```{r workflows}
+## Pipeline
+\tiny
+```{r}
 pipeline <- workflow() %>% 
   add_recipe(blueprint) %>% 
   add_model(rf_spec)
 
 pipeline_fit <- fit(pipeline, data = training_data)
-pipeline_fit
+```
 
+## Pipeline
+\tiny
+```{r}
+pipeline_fit
+```
+
+## Pipeline
+\tiny
+```{r}
 predict(pipeline_fit, testing_data)
 ```
-</div>
 
 ## Recommended resources
-```{r recommended_resources, echo=FALSE, message=FALSE, fig.show="hold", out.width="25%"}
-knitr::include_graphics(c(
-  here("images/homl_with_r.jpg"),
-  here("images/julia_silge.jpg")))
+\tiny
+
+- tidymodels.org
+- bradleyboehmke.github.io/HOML
+- youtube.com/channel/UCTTBgWyJl2HrrhQOOc710kA
+- rebeccabarter.com/blog
+
+## Exercise - the office
+\tiny
+```{r}
+df <- schrute::theoffice
+glimpse(df)
+```
+
+## Exercise - the office
+\tiny
+```{r}
+characters <- c("Michael", "Jim", "Pam", "Dwight")
+
+mydf <- df %>%
+  dplyr::filter(character %in% characters)
+```
+
+```{r echo=FALSE, fig.align='center', out.width='80%'}
+mydf %>%
+  count(character) %>%
+  ggplot(aes(x = reorder(character, -n), y = n, fill = character)) +
+  geom_col() + 
+  theme_minimal() +
+  theme(axis.title = element_blank(), legend.position = "none")
+  
 ```
