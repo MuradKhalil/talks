@@ -3,6 +3,7 @@ title: "Machine Learning with tidymodels"
 author: "Murad Khalilov"
 date: "11/05/2020"
 output: beamer_presentation
+urlcolor: blue
 ---
 
 ```{r setup, include=FALSE}
@@ -18,12 +19,13 @@ library(patchwork)
 knitr::include_graphics(here("images/tidymodels.png"))
 ```
 
-```{r echo=FALSE, message=FALSE, fig.show="hold", fig.align='center', out.width="20%"}
+```{r echo=FALSE, message=FALSE, fig.show="hold", fig.align='center', out.width="15%"}
 knitr::include_graphics(c(
   here("images/rsample.png"),
   here("images/recipes.png"),
   here("images/parsnip.png"),
-  here("images/tune.png")))
+  here("images/tune.png"),
+  here("images/yardstick.png")))
 ```
 
 ## Titanic
@@ -34,13 +36,15 @@ knitr::include_graphics(here("images/titanic.jpg"))
 ## Titanic data
 \tiny
 ```{r message=FALSE}
+library(here)
 library(tidyverse)
 library(tidymodels)
 library(janitor)
 
 titanic <- read_csv(here("input/train.csv")) %>%
   clean_names() %>%
-  mutate(survived = as_factor(survived))
+  mutate(survived = as_factor(survived)) %>%
+  select(survived, everything())
 
 glimpse(titanic)
 ```
@@ -143,6 +147,12 @@ p6 + p7 + p8 + p9
 ```
 
 ## Train test split
+```{r echo=FALSE}
+knitr::include_graphics(here("images/train_test_split.png"))
+```
+
+
+## Train test split
 \tiny
 ```{r train_test_split, message=FALSE}
 train_test_splits <- initial_split(titanic, prop = 0.75, strata = survived)
@@ -162,8 +172,6 @@ knitr::include_graphics(here("images/hadley_cupcakes.jpg"))
 
 ## Recipes workflow
 \tiny
-
-Rebecca Barter:
 
 1) **Get the ingredients (recipe())**: specify the response variable and 
 predictor variables
@@ -223,7 +231,7 @@ prepped <- prep(blueprint, training = training_data, strings_as_factors = T)
 prepped
 ```
 
-## Applying preprocessing steps - juice and bake
+## Apply preprocessing steps - juice and bake
 \tiny
 ```{r}
 # transform the training data
@@ -231,7 +239,7 @@ juiced_train <- juice(prepped)
 juiced_train
 ```
 
-## Applying preprocessing steps - juice and bake
+## Apply preprocessing steps - juice and bake
 \tiny
 ```{r}
 # transform the testing data
@@ -239,31 +247,21 @@ baked_test <- bake(prepped, new_data = testing_data)
 baked_test
 ```
 
-## Modeling - logistic regression
+## Modeling
 \tiny
 ```{r message=FALSE}
 glm_spec <- logistic_reg() %>%
   set_engine("glm") %>%
   set_mode("classification")
 
-glm_fit <- glm_spec %>%
-  fit(survived ~ ., data = juiced_train)
-
-glm_fit
-```
-
-## Modeling - random forest
-\tiny
-```{r, message=FALSE}
-
 rf_spec <- rand_forest() %>%
   set_engine("ranger") %>%
   set_mode("classification")
+```
 
-rf_fit <- rf_spec %>%
-  fit(survived ~ ., data = juiced_train)
-
-rf_fit
+## Cross-validation
+```{r echo=FALSE}
+knitr::include_graphics(here("images/cross_validation.png"))
 ```
 
 ## Cross-validation
@@ -328,7 +326,14 @@ cv_results %>%
   map(~ collect_metrics(.x))
 ```
 
+## Final model fit
+\tiny
 ```{r}
+rf_fit <- rf_spec %>%
+  fit(survived ~ ., data = juiced_train)
+
+rf_fit
+
 rf_fit %>%
   predict(new_data = baked_test, type = "prob") %>%
   mutate(true_label = baked_test$survived) %>%
@@ -360,14 +365,23 @@ predict(pipeline_fit, testing_data)
 ## Recommended resources
 \tiny
 
-- tidymodels.org
-- bradleyboehmke.github.io/HOML
-- youtube.com/channel/UCTTBgWyJl2HrrhQOOc710kA
-- rebeccabarter.com/blog
+- [tidymodels website](https://www.tidymodels.org/)
+- [Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/)
+- [Julia Silge's youtube channel](https://www.youtube.com/channel/UCTTBgWyJl2HrrhQOOc710kA)
+- [Rebecca Barter's blog](http://www.rebeccabarter.com/blog/)
+
+
+## Exercise
+```{r echo=FALSE}
+knitr::include_graphics(here("images/michael_theoffice.png"))
+```
 
 ## Exercise - the office
 \tiny
 ```{r}
+library(textrecipes)
+library(schrute)
+
 df <- schrute::theoffice
 glimpse(df)
 ```
@@ -375,7 +389,7 @@ glimpse(df)
 ## Exercise - the office
 \tiny
 ```{r}
-characters <- c("Michael", "Jim", "Pam", "Dwight")
+characters <- c("Pam", "Dwight")
 
 mydf <- df %>%
   dplyr::filter(character %in% characters)
@@ -388,5 +402,4 @@ mydf %>%
   geom_col() + 
   theme_minimal() +
   theme(axis.title = element_blank(), legend.position = "none")
-  
 ```
