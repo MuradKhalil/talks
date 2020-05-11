@@ -269,7 +269,14 @@ knitr::include_graphics(here("images/cross_validation.png"))
 ```{r}
 validation_splits <- vfold_cv(juiced_train, v = 5, strata = survived)
 validation_splits
+
+# Alternatives
+# ?loo_cv - Leave-One-Out CV
+# ?mc_cv - Monte-Carlo CV
+# ?nested_cv - Nested or Double CV
 ```
+
+[Cross-Validation Techniques](https://scikit-learn.org/stable/modules/cross_validation.html)
 
 ## Cross-validation
 \tiny
